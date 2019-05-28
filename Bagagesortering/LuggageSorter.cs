@@ -11,7 +11,7 @@ namespace Bagagesortering
     public class LuggageSorter
     {
 
-        public static object sorterLock = new object();
+        public static object conveyBeltLock = new object();
         private static Queue<Luggage> _conveyerBelt = new Queue<Luggage>(200);
         private static Terminal[] _terminals;
         private static Reception[] _receptions;
@@ -33,12 +33,12 @@ namespace Bagagesortering
         {
             while (true)
             {
-                lock (sorterLock)
+                lock (conveyBeltLock)
                 {
                     if (_conveyerBelt.Count == 0)
                     {
                         Console.WriteLine("Sorting thread now waiting for a pulse on _conveyerBelt!");
-                        Monitor.Wait(sorterLock);
+                        Monitor.Wait(conveyBeltLock);
                     }
                     else
                     {
@@ -50,7 +50,13 @@ namespace Bagagesortering
 
         public static void QueueLuggage(Luggage luggage)
         {
-            _conveyerBelt.Enqueue(luggage);
+            lock (conveyBeltLock)
+            {
+                _conveyerBelt.Enqueue(luggage);
+
+                Monitor.PulseAll(LuggageSorter.conveyBeltLock);
+            }
+            
         }
         
 
