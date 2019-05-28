@@ -15,6 +15,8 @@ namespace Bagagesortering
         {
             Passenger = passenger;
             Flight = flight;
+
+            this.Passenger.Reservation = this;
         }
 
     }
