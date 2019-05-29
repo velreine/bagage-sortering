@@ -1,26 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Bagagesortering
 {
-    public class LuggageSorter
+    public static class LuggageSorter
     {
 
-        public static object conveyBeltLock = new object();
-        private static Queue<Luggage> _conveyerBelt = new Queue<Luggage>(200);
-        private static Terminal[] _terminals;
-        private static Reception[] _receptions;
+        public static object ConveyBeltLock = new object();
+        private static readonly Queue<Luggage> ConveyerBelt = new Queue<Luggage>(200);
+        //private static Terminal[] _terminals;
+        //private static Reception[] _receptions;
 
-        public LuggageSorter(Terminal[] terminals, Reception[] receptions)
+        /*public LuggageSorter(Terminal[] terminals, Reception[] receptions)
         {
             _terminals = terminals;
             _receptions = receptions;
-        }
+        }*/
 
         private static bool Sort(Luggage luggage)
         {
@@ -33,17 +29,17 @@ namespace Bagagesortering
         {
             while (true)
             {
-                lock (conveyBeltLock)
+                lock (ConveyBeltLock)
                 {
-                    if (_conveyerBelt.Count == 0)
+                    if (ConveyerBelt.Count == 0)
                     {
                         //Console.WriteLine("Sorting thread now waiting for a pulse on _conveyerBelt!");
                         // Wait for things to be put on the convey belt.
-                        Monitor.Wait(conveyBeltLock);
+                        Monitor.Wait(ConveyBeltLock);
                     }
                     else
                     {
-                        Sort(_conveyerBelt.Dequeue());
+                        Sort(ConveyerBelt.Dequeue());
                     }
                 }
             }
@@ -51,16 +47,13 @@ namespace Bagagesortering
 
         public static void QueueLuggage(Luggage luggage)
         {
-            lock (conveyBeltLock)
+            lock (ConveyBeltLock)
             {
-                _conveyerBelt.Enqueue(luggage);
+                ConveyerBelt.Enqueue(luggage);
 
-                Monitor.PulseAll(LuggageSorter.conveyBeltLock);
+                Monitor.PulseAll(ConveyBeltLock);
             }
-            
+
         }
-        
-
-
     }
 }

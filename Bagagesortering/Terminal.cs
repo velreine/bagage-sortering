@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bagagesortering
 {
@@ -26,10 +22,11 @@ namespace Bagagesortering
                 // If there is no reference to luggage at the current index add the luggage.
                 if (_luggage[i] == null)
                 {
+                    luggage.Sorted = DateTime.Now;
                     _luggage[i] = luggage;
                     result = true;
                     // Then break the for loop also.
-                    break;
+                    i = 1000;
                 }
             }
 
