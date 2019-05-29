@@ -9,7 +9,7 @@ namespace Bagagesortering
     public class Terminal
     {
         public Guid ID { get; set; }
-        private Luggage[] _luggage = new Luggage[100];
+        private readonly Luggage[] _luggage = new Luggage[100];
 
         public Terminal(Guid id)
         {

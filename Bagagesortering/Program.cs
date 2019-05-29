@@ -29,47 +29,59 @@ namespace Bagagesortering
             };
 
             // Start the sorting thread.
+            Console.WriteLine("Starting sorting thread!");
             sortingThread.Start();
 
-
-
-
-            foreach (Passenger passenger in Passengers)
+            // Receptions have their own Thread that will have GeneratePassenger as entry point.
+            /*Thread producePassengersThread = new Thread(GeneratePassenger)
             {
-                // Passenger.ToString override returns related information.
-                Console.WriteLine(passenger);
+                Name = "thread_passengerGenerationThread"
+            };
 
-                foreach (Luggage luggage in passenger.GetLuggage())
-                {
-                    // Queue Luggage indirectly via LuggageSorter.QueueLuggage.
-                    LuggageSorter.QueueLuggage(luggage);
-
-                }
-
-                // Seperator on the UI for each passenger (doesn't make much sense when the console output is not synchronized.
-                // TODO: Maybe synchronize console output?.
-                Console.WriteLine("--------------------------------------------------------------------------------");
-                Console.WriteLine("");
-            }
+            producePassengersThread.Start();*/
 
             // Block Main-thread from exiting without user interaction.
             Console.ReadLine();
+        }
+
+        private static void GeneratePassenger()
+        {
+            Random rng = new Random();
+
+            while (true)
+            {
+                Passenger passenger = new Passenger(Passenger.GenerateName(), Guid.NewGuid());
+
+                int numLuggage = rng.Next(0, 4);
+
+                for (int i = 0; i < numLuggage; i++)
+                {
+                    passenger.AddLuggage(new Luggage(Guid.NewGuid(), DateTime.Now));
+                }
+
+                // Make reservation for a random flight for this passenger.
+                passenger.Reservation = new Reservation(passenger, Flights[rng.Next(0, Flights.Length - 1)]);
+
+                Console.WriteLine(passenger);
+
+                // Sort the passengers luggage:
+                foreach (Luggage luggage in passenger.GetLuggage())
+                {
+                    LuggageSorter.QueueLuggage(luggage);
+                }
 
 
-
+                Thread.Sleep(1);
+            }
         }
 
 
         static void InitializeStaticData()
         {
+            Console.WriteLine("InitializeStaticData() running.");
             // Our Random will be used when assigning passenger reservations to random flights.
             Random rng = new Random();
 
-            // Create some receptions.
-            for (int i = 0; i < Receptions.Length; i++)
-            {
-                Receptions[i] = new Reception(Guid.NewGuid());
-            }
 
             // Create some terminals.
             for (int i = 0; i < Terminals.Length; i++)
@@ -83,8 +95,14 @@ namespace Bagagesortering
                 Flights[i] = new Flight(Terminals[i], Guid.NewGuid(), Flight.GenerateName());
             }
 
+            // Create some receptions.
+            for (int i = 0; i < Receptions.Length; i++)
+            {
+                Receptions[i] = new Reception(Guid.NewGuid(), new Thread(GeneratePassenger));
+            }
+
             // Create some passengers.
-            for (int i = 0; i < Passengers.Length; i++)
+            /*for (int i = 0; i < Passengers.Length; i++)
             {
                 Passengers[i] = new Passenger(Passenger.GenerateName(), Guid.NewGuid());
 
@@ -97,8 +115,8 @@ namespace Bagagesortering
                     Passengers[i].AddLuggage(new Luggage(Guid.NewGuid(), DateTime.Now));
                 }
 
-            }
-
+            }*/
+            Console.WriteLine("InitializeStaticData() done!");
         }
 
     }

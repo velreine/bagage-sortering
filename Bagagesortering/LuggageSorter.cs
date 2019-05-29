@@ -22,9 +22,9 @@ namespace Bagagesortering
             _receptions = receptions;
         }
 
-        public static bool Sort(Luggage luggage)
+        private static bool Sort(Luggage luggage)
         {
-            Console.WriteLine($"Trying to sort {luggage.Owner.Name}'s {luggage.ID}, i want to put it in Terminal: {luggage.Owner.Reservation.Flight.Terminal.ID}");
+            Console.WriteLine($"Trying to sort {luggage.Owner.Name}'s {luggage.ID}, putting it in Terminal: {luggage.Owner.Reservation.Flight.Terminal.ID}");
             return luggage.Owner.Reservation.Flight.Terminal.AddLuggage(luggage);
             //return false;
         }
@@ -37,7 +37,8 @@ namespace Bagagesortering
                 {
                     if (_conveyerBelt.Count == 0)
                     {
-                        Console.WriteLine("Sorting thread now waiting for a pulse on _conveyerBelt!");
+                        //Console.WriteLine("Sorting thread now waiting for a pulse on _conveyerBelt!");
+                        // Wait for things to be put on the convey belt.
                         Monitor.Wait(conveyBeltLock);
                     }
                     else

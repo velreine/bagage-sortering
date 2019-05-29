@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bagagesortering
@@ -9,10 +10,15 @@ namespace Bagagesortering
     public class Reception
     {
         public Guid ID { get; set; }
+        public bool Open { get; private set; } = true;
 
-        public Reception(Guid id)
+        private readonly Thread _workerThread;
+
+        public Reception(Guid id, Thread workerThread)
         {
-            ID = id;    
+            ID = id;
+            this._workerThread = workerThread;
+            _workerThread.Start();
         }
 
         public Reservation MakeReservation(Passenger passenger, Flight flight)
@@ -20,6 +26,11 @@ namespace Bagagesortering
             return new Reservation(passenger, flight);
         }
 
+        public void Close()
+        {
+            Open = false;
+            _workerThread.Abort();
+        }
 
     }
 }

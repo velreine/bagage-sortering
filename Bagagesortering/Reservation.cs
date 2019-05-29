@@ -16,6 +16,8 @@ namespace Bagagesortering
             Passenger = passenger;
             Flight = flight;
 
+            if(flight == null) Console.WriteLine("Reservation created with NULL flight??");
+
             this.Passenger.Reservation = this;
         }
 
